@@ -1,32 +1,37 @@
 pipeline {
     agent any
 
+    environment {
+        IMAGE_NAME = "ajithkumar377/flaskapp:latest"
+    }
+
     stages {
-        stage('Clone GitHub Repo') {
+        stage('Build Docker Image') {
             steps {
-                git branch: 'main', url: 'https://github.com/Ajithkumar377/Practice.git'
+                sh 'docker build -t $IMAGE_NAME .'
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Login to Docker Hub') {
             steps {
-                sh 'docker build -t ajithkumar377/flaskapp:latest ./app'
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh 'echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin'
+                }
             }
         }
 
         stage('Push to Docker Hub') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
-                    sh 'docker push ajithkumar377/flaskapp:latest'
-                }
+                sh 'docker push $IMAGE_NAME'
             }
         }
 
         stage('Run Docker Container') {
             steps {
-                docker rm -f flask-container || true
-                docker run -d --name flask-container -p 5000:5000 ajithkumar377/flaskapp:latest
+                sh '''
+                    docker rm -f flask-container || true
+                    docker run -d --name flask-container -p 5000:5000 $IMAGE_NAME
+                '''
             }
         }
     }
