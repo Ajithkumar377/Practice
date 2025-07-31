@@ -3,15 +3,39 @@
 <head>
     <title>Shopping Site</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body { font-family: Arial; background: #f4f4f4; text-align: center; }
+        .product { display: inline-block; margin: 20px; padding: 10px; background: white; box-shadow: 0 0 5px #ccc; }
+        img { width: 200px; height: 200px; object-fit: cover; }
+    </style>
 </head>
 <body>
     <h1>🛒 Welcome to DevOps Shop!</h1>
-    <ul>
-        <li>📱 Smartphone - ₹29,999</li>
-        <li>💻 Laptop - ₹79,999</li>
-        <li>🎧 Headphones - ₹1,999</li>
-        <li>⌚ Smartwatch - ₹4,999</li>
-    </ul>
+
+    <div class="product">
+        <img src="{{ url_for('static', filename='images/product1.jpg') }}" alt="Smartphone">
+        <p><strong>📱 Smartphone</strong></p>
+        <p>₹29,999</p>
+    </div>
+
+    <div class="product">
+        <img src="{{ url_for('static', filename='images/product2.jpg') }}" alt="Laptop">
+        <p><strong>💻 Laptop</strong></p>
+        <p>₹79,999</p>
+    </div>
+
+    <div class="product">
+        <img src="{{ url_for('static', filename='images/product3.jpg') }}" alt="Headphones">
+        <p><strong>🎧 Headphones</strong></p>
+        <p>₹1,999</p>
+    </div>
+
+    <div class="product">
+        <img src="{{ url_for('static', filename='images/product4.jpg') }}" alt="Smartwatch">
+        <p><strong>⌚ Smartwatch</strong></p>
+        <p>₹4,999</p>
+    </div>
+
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

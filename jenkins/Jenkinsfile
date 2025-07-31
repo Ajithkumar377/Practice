@@ -1,33 +1,38 @@
 pipeline {
-    agent any
-    stages {
-        stage('Clone Repo') {
-            steps {
-                git branch: 'main', url: 'https://github.com/Ajithkumar377/Practice.git'
-            }
-        }
-        stage('Build Docker Image') {
-            steps {
-                sh 'docker build -t ajithkumar377/shopping-flask:latest ./app'
-            }
-        }
-        stage('Push Docker Image') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
-                    sh 'docker push ajithkumar377/shopping-flask:latest'
-                }
-            }
-        }
-        stage('Deploy to Kubernetes') {
-            environment {
-                KUBECONFIG = '/var/lib/jenkins/.kube/config'
-            }
-            steps {
-                sh 'kubectl apply -f k8s/deployment.yaml'
-                sh 'kubectl apply -f k8s/service.yaml'
-            }
-        }
+  agent any
+
+  stages {
+    stage('Clone Repository') {
+      steps {
+        git branch: 'main' url: 'https://github.com/Ajithkumar377/Practice.git'
+      }
     }
+
+    stage('Build Docker Image') {
+      steps {
+        dir('app') {
+          sh 'docker build -t ajithkumar377/flask-app:latest .'
+        }
+      }
+    }
+
+    stage('Push to Docker Hub') {
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+          sh """
+            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+            docker push ajithkumar377/flask-app:latest
+          """
+        }
+      }
+    }
+
+    stage('Deploy to Kubernetes') {
+      steps {
+        sh 'kubectl apply -f k8s/deployment.yaml'
+        sh 'kubectl apply -f k8s/service.yaml'
+      }
+    }
+  }
 }
 
