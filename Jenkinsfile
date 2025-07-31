@@ -25,7 +25,8 @@ pipeline {
 
         stage('Run Docker Container') {
             steps {
-                sh 'docker run -d -p 5000:5000 ajithkumar377/flaskapp:latest'
+                docker rm -f flask-container || true
+                docker run -d --name flask-container -p 5000:5000 ajithkumar377/flaskapp:latest
             }
         }
     }
